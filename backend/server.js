@@ -1,28 +1,57 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
-const pool = require('./database/db');
+const sequelize = require('./database/db'); // Sequelize instance
+const Product = require('./Models/Product'); // Import the Product model
+const { Op } = require('sequelize'); // Import Sequelize operators
+
 const app = express();
 const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// Search route
+// Connect to the database
+sequelize.sync()
+  .then(() => console.log("Database synced successfully"))
+  .catch((err) => console.error("Error syncing database:", err));
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Search route using Sequelize
 app.get('/search', async (req, res) => {
   const query = req.query.q;
-  
+
   try {
     console.log('query', query);
-    
-    const result = await pool.query('SELECT * FROM products WHERE name ILIKE $1', [`%${query}%`]);
-    res.json(result.rows);
+
+    // Use Sequelize to search for products
+    const products = await Product.findAll({
+      where: {
+        name: {
+          [Op.iLike]: `%${query}%` // Case-insensitive search
+        }
+      }
+    });
+
+    res.json(products);
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
   }
 });
+//methode to add a product
+app.post('/products', async (req, res) => {
+  console.log("✅ POST /products route hit!");
+  const { name } = req.body;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  try {
+    const product = await Product.create({ name });
+    res.status(201).json(product);
+  } catch (error) {
+    console.error(" Error adding product:", error.message);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
 });
+
