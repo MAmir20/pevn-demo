@@ -1,18 +1,19 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, watch, onMounted } from "vue";
+import axios from "axios";
 
-const query = ref('');
+const query = ref("");
 const results = ref([]); // Holds search results
 const products = ref([]); // Holds the full product list
 
 // Fetch all products for the table
 const getAll = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/getAll');
+    const response = await axios.get("http://localhost:5000/getAll");
     products.value = response.data;
+    results.value = response.data; // Initialize search results with full list
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
   }
 };
 
@@ -20,33 +21,15 @@ const getAll = async () => {
 const search = async () => {
   if (query.value.length > 0) {
     try {
-      const response = await axios.get(`http://localhost:5000/search?q=${query.value}`);
+      const response = await axios.get(
+        `http://localhost:5000/search?q=${query.value}`
+      );
       results.value = response.data;
     } catch (error) {
-      console.error('Error fetching search results:', error);
+      console.error("Error fetching search results:", error);
     }
   } else {
-    results.value = []; // Clear search results when input is empty
-  }
-};
-
-// Add a new product
-const newProduct = ref({
-  name: '',
-});
-
-const addProduct = async () => {
-  if (!newProduct.value.name.trim()) {
-    alert("Product name cannot be empty!");
-    return;
-  }
-
-  try {
-    const response = await axios.post('http://localhost:5000/products', newProduct.value);
-    products.value.push(response.data); // Add new product to the full list
-    newProduct.value.name = ''; // Reset input field
-  } catch (error) {
-    console.error('Error adding product:', error);
+    results.value = products.value; // Reset to full list if query is empty
   }
 };
 
@@ -61,39 +44,23 @@ watch(query, search);
   <div>
     <!-- Search Input -->
     <input v-model="query" type="text" placeholder="Search..." />
-    
-    <!-- Search Results (Only appears when searching) -->
-    <ul v-if="results.length > 0">
-      <li v-for="item in results" :key="item.id">{{ item.name }}</li>
-    </ul>
+    <h2 v-if="query.length > 0">Search results for "{{ query }}"</h2>
+    <h2 v-else>All products list</h2>
+    <table v-if="results.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="product in results" :key="product.id">
+          <td>{{ product.id }}</td>
+          <td>{{ product.name }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
-  <div class="container">
-    <h2>Add Product</h2>
-
-    <!-- Add Product Form -->
-    <form @submit.prevent="addProduct" class="product-form">
-      <input v-model="newProduct.name" type="text" placeholder="Enter product name" required />
-      <button type="submit">Add Product</button>
-    </form>
-  </div>
-
-  <!-- Product Table (Always Visible) -->
-  <h2>Product List</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Product Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="product in products" :key="product.id">
-        <td>{{ product.id }}</td>
-        <td>{{ product.name }}</td>
-      </tr>
-    </tbody>
-  </table>
 </template>
 
 <style scoped>
@@ -129,7 +96,8 @@ table {
   border-collapse: collapse;
   margin-top: 10px;
 }
-th, td {
+th,
+td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
