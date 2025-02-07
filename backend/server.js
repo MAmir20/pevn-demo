@@ -68,3 +68,21 @@ app.post('/products', async (req, res) => {
   }
 });
 
+//methode to delete a product
+app.delete('/products/:id', async (req, res) => {
+  console.log(" DELETE /products route hit!");
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    await product.destroy();
+    res.status(204).end();
+  } catch (error) {
+    console.error(" Error deleting product:", error.message);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+});
