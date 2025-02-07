@@ -19,6 +19,19 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+//methode to get all products
+app.get('/getAll', async (req, res) => {
+  console.log(" GET /products route hit!");
+
+  try {
+    const products = await Product.findAll();
+    res.json(products);
+  } catch (error) {
+    console.error(" Error getting products:", error.message);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+});
+
 // Search route using Sequelize
 app.get('/search', async (req, res) => {
   const query = req.query.q;

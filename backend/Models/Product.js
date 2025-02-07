@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../database/db');  // Import the Sequelize connection
+const sequelize = require('../database/db');  
 
 const Product = sequelize.define('Product', {
   id: {
@@ -9,7 +9,7 @@ const Product = sequelize.define('Product', {
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false,  // Required field
+    allowNull: false,  
   }
 });
 module.exports = Product;
