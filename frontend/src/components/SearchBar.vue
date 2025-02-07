@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import axios from "axios";
+import ProductsList from "./ProductsList.vue";
 
 const query = ref("");
 const results = ref([]); // Holds search results
@@ -54,65 +55,16 @@ watch(query, search);
   <div>
     <!-- Search Input -->
     <input v-model="query" type="text" placeholder="Search..." />
-    <h2 v-if="query.length > 0">Search results for "{{ query }}"</h2>
-    <h2 v-else>All products list</h2>
-    <table v-if="results.length > 0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Product Name</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in results" :key="product.id">
-          <td>{{ product.id }}</td>
-          <td>{{ product.name }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <ProductsList :products="results" :query="query" />
   </div>
 </template>
 
 <style scoped>
-.container {
-  max-width: 600px;
-  margin: auto;
-  text-align: center;
-}
-.product-form {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
+
 input {
   padding: 8px;
   margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-button {
-  padding: 8px 15px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #0056b3;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-th {
-  background-color: #f4f4f4;
 }
 </style>

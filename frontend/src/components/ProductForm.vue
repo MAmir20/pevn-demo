@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import axios from "axios";
+import ProductsList from "./ProductsList.vue";
 
 interface Product {
   id: number;
@@ -62,22 +63,7 @@ onMounted(getAll);
     </form>
   </div>
 
-  <!-- Product Table (Always Visible) -->
-  <h2>Product List</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Product Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="product in products" :key="product.id">
-        <td>{{ product.id }}</td>
-        <td>{{ product.name }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <ProductsList :products="products" />
 </template>
 
 <style scoped>
