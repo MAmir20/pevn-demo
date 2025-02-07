@@ -9,7 +9,7 @@ const products = ref([]); // Holds the full product list
 // Fetch all products for the table
 const getAll = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/getAll");
+    const response = await axios.get("http://localhost:5000/Product/getAll");
     products.value = response.data;
     results.value = response.data; // Initialize search results with full list
   } catch (error) {
@@ -22,7 +22,7 @@ const search = async () => {
   if (query.value.length > 0) {
     try {
       const response = await axios.get(
-        `http://localhost:5000/search?q=${query.value}`
+        `http://localhost:5000/Product/search?q=${query.value}`
       );
       results.value = response.data;
     } catch (error) {
@@ -30,6 +30,16 @@ const search = async () => {
     }
   } else {
     results.value = products.value; // Reset to full list if query is empty
+  }
+};
+//methode to delete product
+const deleteProduct = async (id) => {
+  try {
+    await axios.delete(`http://localhost:5000/Product/products/${id}`);
+    products.value = products.value.filter((product) => product.id !== id);
+    results.value = results.value.filter((product) => product.id !== id);
+  } catch (error) {
+    console.error("Error deleting product:", error);
   }
 };
 

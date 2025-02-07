@@ -2,12 +2,17 @@
 import { ref, watch, onMounted } from "vue";
 import axios from "axios";
 
-const products = ref([]); // Holds the full product list
+interface Product {
+  id: number;
+  name: string;
+}
+
+const products = ref<Product[]>([]); // Holds the full product list
 
 // Fetch all products for the table
 const getAll = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/getAll");
+    const response = await axios.get("http://localhost:5000/Product/getAll");
     products.value = response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -27,7 +32,7 @@ const addProduct = async () => {
 
   try {
     const response = await axios.post(
-      "http://localhost:5000/products",
+      "http://localhost:5000/Product/addproducts",
       newProduct.value
     );
     products.value.push(response.data); // Add new product to the full list

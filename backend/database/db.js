@@ -1,5 +1,7 @@
-const { Sequelize } = require('sequelize');
-require('dotenv').config();
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
+
+dotenv.config(); // Load environment variables
 
 // Setting up the Sequelize connection to PostgreSQL
 const sequelize = new Sequelize(
@@ -9,9 +11,9 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,  
     port: process.env.DB_PORT,  
-    dialect: 'postgres',        
+    dialect: "postgres",        
     logging: false,             // Disable SQL query logging (optional)
   }
 );
 
-module.exports = sequelize;
+export default sequelize;
