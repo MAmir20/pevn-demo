@@ -1,4 +1,4 @@
-import { fetchAllProducts, searchProducts, createProduct, deleteProduct } from "../services/productService.js";
+import { fetchAllProducts, searchProducts, createProduct, deleteProduct, updateProduct } from "../Services/ProductService.js";
 
 export const getAllProducts = async (req, res) => {
   try {
@@ -36,6 +36,15 @@ export const removeProduct = async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting product:", error.message);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+};
+export const editProduct = async (req, res) => {
+  try {
+    const product = await updateProduct(req.params.id, req.body.name);
+    res.status(201).json(product);
+  } catch (error) {
+    console.error("Error editing product:", error.message);
     res.status(500).json({ error: "Server error", details: error.message });
   }
 };

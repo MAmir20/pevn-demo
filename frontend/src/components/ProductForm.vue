@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import axios from "axios";
 import ProductsList from "./ProductsList.vue";
 
@@ -8,10 +8,12 @@ interface Product {
   name: string;
 }
 
-const products = ref<Product[]>([]); // Holds the full product list
+const products = ref<Product[]>([]); // Holds the product list
+const editingProduct = ref<Product | null>(null); // Stores the product being edited
+const updatedName = ref(""); // Stores the updated name
 
-// Fetch all products for the table
-const getAll = async () => {
+// Fetch all products
+const fetchProducts = async () => {
   try {
     const response = await axios.get("http://localhost:5000/Product/getAll");
     products.value = response.data;
@@ -21,9 +23,7 @@ const getAll = async () => {
 };
 
 // Add a new product
-const newProduct = ref({
-  name: "",
-});
+const newProduct = ref({ name: "" });
 
 const addProduct = async () => {
   if (!newProduct.value.name.trim()) {
@@ -32,38 +32,60 @@ const addProduct = async () => {
   }
 
   try {
-    const response = await axios.post(
-      "http://localhost:5000/Product/addproducts",
-      newProduct.value
-    );
-    products.value.push(response.data); // Add new product to the full list
+    await axios.post("http://localhost:5000/Product/addproducts", newProduct.value);
     newProduct.value.name = ""; // Reset input field
+    fetchProducts(); // Refresh product list
   } catch (error) {
     console.error("Error adding product:", error);
   }
 };
 
+// Handle editing a product
+const startEditing = (product: Product) => {
+  editingProduct.value = { ...product }; // Copy the product object
+  updatedName.value = product.name; // Set the input field value
+};
+
+
+const updateProduct = async () => {
+  if (!editingProduct.value) return;
+
+  try {
+    await axios.put(`http://localhost:5000/Product/editproducts/${editingProduct.value.id}`, {
+      name: updatedName.value,
+    });
+
+    editingProduct.value = null; // Clear editing state
+    fetchProducts(); // Refresh product list
+  } catch (error) {
+    console.error("Error updating product:", error);
+  }
+};
+
 // Load all products on mount
-onMounted(getAll);
+onMounted(fetchProducts);
 </script>
 
 <template>
   <div class="container">
     <h2>Add Product</h2>
 
-    <!-- Add Product Form -->
     <form @submit.prevent="addProduct" class="product-form">
-      <input
-        v-model="newProduct.name"
-        type="text"
-        placeholder="Enter product name"
-        required
-      />
+      <input v-model="newProduct.name" type="text" placeholder="Enter product name" required />
       <button type="submit">Add Product</button>
     </form>
-  </div>
 
-  <ProductsList :products="products" />
+    <!-- Edit Product Form -->
+    <div v-if="editingProduct" class="edit-form">
+      <h3>Editing Product: {{ editingProduct.name }}</h3>
+      <input v-model="updatedName" type="text" required />
+      <button @click="updateProduct">Save</button>
+      <button @click="editingProduct = null">Cancel</button>
+    </div>
+
+    <!-- Pass products and editing handler to child -->
+    <ProductsList :products="products" @productDeleted="fetchProducts" @editProduct="startEditing" />
+  </div>
 </template>
 
 <style scoped>
@@ -76,6 +98,12 @@ onMounted(getAll);
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
+}
+.edit-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px;
 }
 input {
   padding: 8px;
@@ -93,19 +121,5 @@ button {
 }
 button:hover {
   background-color: #0056b3;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-th {
-  background-color: #f4f4f4;
 }
 </style>

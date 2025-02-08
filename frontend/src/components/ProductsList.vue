@@ -1,21 +1,26 @@
-<script setup>
-import { defineProps } from "vue";
+<script setup lang="ts">
+import { defineProps, defineEmits } from "vue";
 import axios from "axios";
-const props = defineProps({
-  products: Array,
-  query: {
-    type: String,
-    default: "",
-  },
-});
 
-const deleteProduct = async (id) => {
+// Define props
+interface Product {
+  id: number;
+  name: string;
+}
+
+const props = defineProps<{ products: Product[] }>();
+
+// Define emits for communicating with the parent
+const emit = defineEmits(["productDeleted", "editProduct"]);
+
+const deleteProduct = async (id: number) => {
   if (confirm("Are you sure you want to delete this product?")) {
     try {
-      const response = await axios.delete(`http://localhost:5000/products/${id}`);
-        console.log("Product deleted:", response.data);
-        const response2 = await axios.get("http://localhost:5000/getAll");
-        products.value = response.data;
+      await axios.delete(`http://localhost:5000/Product/products/${id}`);
+      console.log("Product deleted");
+
+      // Emit an event to tell the parent to reload data
+      emit("productDeleted");
     } catch (error) {
       console.error("Error deleting product:", error);
     }
@@ -25,12 +30,9 @@ const deleteProduct = async (id) => {
 
 <template>
   <div>
-    <!-- Search Input -->
-    <h2 v-if="props.query.length > 0">
-      Search results for "{{ props.query }}"
-    </h2>
-    <h2 v-else>All products list</h2>
-    <table v-if="props.products.length > 0">
+    <h2>All Products List</h2>
+
+    <table v-if="products.length > 0">
       <thead>
         <tr>
           <th>ID</th>
@@ -39,14 +41,12 @@ const deleteProduct = async (id) => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product in props.products" :key="product.id">
+        <tr v-for="product in products" :key="product.id">
           <td>{{ product.id }}</td>
           <td>{{ product.name }}</td>
           <td>
-            <button type="button">Edit</button> -
-            <button type="button" @click="deleteProduct(product.id)">
-              Delete
-            </button>
+            <button type="button" @click="emit('editProduct', product)">Edit</button>
+            <button type="button" @click="deleteProduct(product.id)">Delete</button>
           </td>
         </tr>
       </tbody>

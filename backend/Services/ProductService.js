@@ -24,3 +24,10 @@ export const deleteProduct = async (id) => {
   if (!product) throw new Error(`Product with id ${id} not found`);
   await product.destroy();
 };
+export const updateProduct = async (id, name) => {
+  const product = await Product.findByPk(id);
+  if (!product) throw new Error(`Product with id ${id} not found`);
+  product.name = name;
+  await product.save();
+  return product;
+};
