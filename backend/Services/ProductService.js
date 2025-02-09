@@ -1,6 +1,10 @@
 import Product from "../Models/Product.js"
 import { Op } from "sequelize";
 
+export const fetchProduct = async (id) => {
+  return await Product.findByPk(id);
+};
+
 export const fetchAllProducts = async () => {
   return await Product.findAll();
 };

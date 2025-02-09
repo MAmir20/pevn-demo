@@ -1,4 +1,14 @@
-import { fetchAllProducts, searchProducts, createProduct, deleteProduct, updateProduct } from "../Services/ProductService.js";
+import { fetchAllProducts, fetchProduct, searchProducts, createProduct, deleteProduct, updateProduct } from "../Services/ProductService.js";
+
+export const getProduct = async (req, res) => {
+  try {
+    const product = await fetchProduct(req.params.id);
+    res.json(product);
+  } catch (error) {
+    console.error("Error fetching product:", error.message);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+}
 
 export const getAllProducts = async (req, res) => {
   try {
