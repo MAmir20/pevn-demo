@@ -83,13 +83,13 @@ const resetForm = () => {
                 </svg>
               </span>
 
-              <input v-model="formData.name" type="text"
+              <input v-model="formData.name" type="text" @keyup.enter="submitForm(formData)"
                 class="form-input w-full px-12 py-2 appearance-none rounded-md focus:border-indigo-600" />
             </div>
           </div>
 
           <div class="flex justify-between items-center px-5 py-3">
-            <nx-button variant="info" @click="resetForm">
+            <nx-button variant="info" @click.prevent="resetForm">
               Reset
             </nx-button>
             <nx-button variant="primary" @click="submitForm(formData)">
