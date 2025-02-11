@@ -94,6 +94,7 @@ const resetForm = () => {
                 v-model="formData.name" 
                 type="text" 
                 @input="validateForm"
+                @keyup.enter="submitForm"
                 class="form-input w-full px-12 py-2 appearance-none rounded-md border focus:border-indigo-600"
                 :class="{ 'border-red-500': isInvalid }"
               />
