@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProductService from "@/services/ProductService";
 import type { Product } from "@/models/Product";
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import NxButton from "../ui/NxButton.vue";
 
@@ -14,6 +14,8 @@ const router = useRouter();
 const editingProduct = ref<Product | null>(null);
 const formData = ref<FormData>({ name: "" });
 const editMode = ref(false);
+const errorMessage = ref<string | null>(null);
+const isTouched = ref(false);
 
 const updateMode = () => {
   editMode.value = route.name === "editProduct";
@@ -29,36 +31,41 @@ const updateMode = () => {
   }
 };
 
-watch(() => route.fullPath, updateMode);
+const validateForm = () => {
+  isTouched.value = true;
+  if (!formData.value.name?.trim()) {
+    errorMessage.value = "Product name cannot be empty!";
+    return false;
+  }
+  errorMessage.value = null;
+  return true;
+};
 
+// Computed property to apply red border when invalid
+const isInvalid = computed(() => isTouched.value && !formData.value.name?.trim());
+
+watch(() => route.fullPath, updateMode);
 onMounted(updateMode);
 
-const submitForm = async (product: FormData) => {
+const submitForm = async () => {
+  if (!validateForm()) return;
+
   try {
-    if (!product.name?.trim()) {
-      alert("Product name cannot be empty!");
-      return;
-    }
     if (editMode.value) {
-      ProductService.update(editingProduct.value!.id, product).then(() => {
-        router.push("/");
-      });
+      await ProductService.update(editingProduct.value!.id, formData.value);
     } else {
-      ProductService.create(product).then(() => {
-        router.push("/");
-      });
+      await ProductService.create(formData.value);
     }
+    router.push("/");
   } catch (error) {
     console.error("Error submitting the form:", error);
   }
 };
 
 const resetForm = () => {
-  if (editMode.value) {
-    formData.value.name = editingProduct.value?.name;
-  } else {
-    formData.value.name = "";
-  }
+  formData.value.name = editMode.value ? editingProduct.value?.name : "";
+  errorMessage.value = null;
+  isTouched.value = false;
 };
 </script>
 
@@ -71,7 +78,7 @@ const resetForm = () => {
             {{ editMode ? "Editing Product '" + formData.name + "'" : "Add Product" }}
           </h3>
         </div>
-        <form class="product-form">
+        <form class="product-form" @submit.prevent="submitForm">
           <div class="px-5 py-6 bg-gray-100 text-gray-700 border-b">
             <label class="text-xs">Name</label>
 
@@ -83,8 +90,18 @@ const resetForm = () => {
                 </svg>
               </span>
 
-              <input v-model="formData.name" type="text" @keyup.enter="submitForm(formData)"
-                class="form-input w-full px-12 py-2 appearance-none rounded-md focus:border-indigo-600" />
+              <input 
+                v-model="formData.name" 
+                type="text" 
+                @input="validateForm"
+                class="form-input w-full px-12 py-2 appearance-none rounded-md border focus:border-indigo-600"
+                :class="{ 'border-red-500': isInvalid }"
+              />
+
+              <!-- Error Message -->
+              <p v-if="errorMessage" class="text-red-500 text-sm mt-1">
+                {{ errorMessage }}
+              </p>
             </div>
           </div>
 
@@ -92,7 +109,7 @@ const resetForm = () => {
             <nx-button variant="info" @click.prevent="resetForm">
               Reset
             </nx-button>
-            <nx-button variant="primary" @click="submitForm(formData)">
+            <nx-button variant="primary" @click="submitForm">
               Save
             </nx-button>
           </div>

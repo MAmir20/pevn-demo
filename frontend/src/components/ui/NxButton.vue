@@ -6,16 +6,17 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["click"]);
+
 const computedClass = computed(() => {
     switch (props.variant) {
         case "primary":
-            return "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded";
+            return "bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded";
         case "secondary":
-            return "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded";
+            return "bg-green-800 hover:bg-green-900 text-white font-bold py-2 px-4 rounded";
         case "danger":
-            return "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded";
+            return "bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-4 rounded";
         case "info":
-            return "bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded";
+            return "bg-teal-800 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded";
     }
 });
 </script>
