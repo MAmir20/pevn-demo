@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const props = defineProps<{
-    variant: string;
-}>();
+const props = withDefaults(defineProps<{ variant: string; isSubmit?: boolean; isDisabled?: boolean }>(), {
+    isSubmit: false,
+    isDisabled: false,
+});
 
-const computedClass = computed(() => {
+const variantClass = computed(() => {
     switch (props.variant) {
         case "primary":
             return "bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded";
@@ -17,12 +18,17 @@ const computedClass = computed(() => {
             return "bg-teal-800 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded";
     }
 });
+
+const disabledClass = computed(() => {
+    return props.isDisabled ? "opacity-50 cursor-not-allowed" : "";
+});
 </script>
 
 <template>
   <button
-    @click.self.prevent
-    :class="[computedClass]"
+    :class="[variantClass, disabledClass]"
+    :type="props.isSubmit ? 'submit' : 'button'"
+    :disabled="props.isDisabled"
   >
     <slot />
   </button>

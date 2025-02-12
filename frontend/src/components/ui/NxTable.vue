@@ -76,7 +76,7 @@ const emit = defineEmits(["add", "delete", "edit", "show", "search"]);
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in props.data" :key="item.id">
+              <tr v-if="props.data.length > 0" v-for="item in props.data" :key="item.id">
                 <td
                   v-for="(value, name, index) in item"
                   :key="item.id"
@@ -84,7 +84,7 @@ const emit = defineEmits(["add", "delete", "edit", "show", "search"]);
                 >
                   <p class="text-gray-900 whitespace-no-wrap">{{ value }}</p>
                 </td>
-                <td v-if="showActions">
+                <td v-if="showActions" class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <span>
                     <nx-button
                       v-if="props.show"
@@ -110,6 +110,14 @@ const emit = defineEmits(["add", "delete", "edit", "show", "search"]);
                       Delete
                     </nx-button>
                   </span>
+                </td>
+              </tr>
+              <tr v-else>
+                <td
+                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+                  :colspan="props.headers.length + (showActions ? 1 : 0)"
+                >
+                  No data available
                 </td>
               </tr>
             </tbody>
