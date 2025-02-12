@@ -78,7 +78,7 @@ const resetForm = () => {
             {{ editMode ? "Editing Product '" + formData.name + "'" : "Add Product" }}
           </h3>
         </div>
-        <form class="product-form" @submit.prevent="submitForm">
+        <form class="product-form" @submit.prevent>
           <div class="px-5 py-6 bg-gray-100 text-gray-700 border-b">
             <label class="text-xs">Name</label>
 
@@ -94,6 +94,7 @@ const resetForm = () => {
                 v-model="formData.name" 
                 type="text" 
                 @input="validateForm"
+                @keydown.enter.prevent
                 @keyup.enter="submitForm"
                 class="form-input w-full px-12 py-2 appearance-none rounded-md border focus:border-indigo-600"
                 :class="{ 'border-red-500': isInvalid }"
@@ -107,7 +108,7 @@ const resetForm = () => {
           </div>
 
           <div class="flex justify-between items-center px-5 py-3">
-            <nx-button variant="info" @click.prevent="resetForm">
+            <nx-button variant="info" @click="resetForm">
               Reset
             </nx-button>
             <nx-button variant="primary" @click="submitForm">

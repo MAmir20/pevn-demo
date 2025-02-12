@@ -33,7 +33,6 @@ const deleteProduct = async (id: number) => {
         console.log("Product deleted");
         fetchProducts();
       });
-      console.log("Product deleted");
     } catch (error) {
       console.error("Error deleting product:", error);
     }

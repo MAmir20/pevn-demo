@@ -5,8 +5,6 @@ const props = defineProps<{
     variant: string;
 }>();
 
-const emit = defineEmits(["click"]);
-
 const computedClass = computed(() => {
     switch (props.variant) {
         case "primary":
@@ -23,7 +21,7 @@ const computedClass = computed(() => {
 
 <template>
   <button
-    @click.prevent="emit('click')"
+    @click.self.prevent
     :class="[computedClass]"
   >
     <slot />
